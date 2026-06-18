@@ -1,2 +1,0 @@
-# calculatortoki
-a;ldkfja;ea
