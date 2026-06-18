@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Improved Calculator</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .calculator {
+            width: min(100%, 360px);
+            background: linear-gradient(145deg, #1e293b, #111827);
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+        }
+
+        .calculator__header {
+            margin: 0 0 16px;
+            text-align: center;
+            font-size: 1.2rem;
+            letter-spacing: 0.08em;
+            color: #cbd5e1;
+        }
+
+        .display {
+            background: #0f172a;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 24px;
+            padding: 22px 18px;
+            text-align: right;
+            min-height: 72px;
+            font-size: 2rem;
+            line-height: 1.1;
+            overflow-wrap: break-word;
+            word-break: break-all;
+            color: #f8fafc;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            border: none;
+            border-radius: 18px;
+            padding: 18px 14px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #f8fafc;
+            cursor: pointer;
+            transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+
+        .button-number {
+            background: #111827;
+            box-shadow: inset 0 -2px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        .button-operator {
+            background: #4f46e5;
+            box-shadow: 0 10px 18px rgba(79, 70, 229, 0.2);
+        }
+
+        .button-function {
+            background: #334155;
+            color: #cbd5e1;
+        }
+
+        .button-equals {
+            background: #f59e0b;
+            color: #0f172a;
+            grid-column: span 2;
+            box-shadow: 0 14px 24px rgba(245, 158, 11, 0.25);
+        }
+
+        .button-wide {
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1 class="calculator__header">Smart Calculator</h1>
+        <div class="display" id="display">0</div>
+
+        <div class="buttons">
+            <button type="button" class="button-function" data-action="clear">AC</button>
+            <button type="button" class="button-function" data-action="backspace">⌫</button>
+            <button type="button" class="button-function" data-action="credit">Credit</button>
+            <button type="button" class="button-operator" data-value="/">÷</button>
+
+            <button type="button" class="button-number" data-value="7">7</button>
+            <button type="button" class="button-number" data-value="8">8</button>
+            <button type="button" class="button-number" data-value="9">9</button>
+            <button type="button" class="button-operator" data-value="*">×</button>
+
+            <button type="button" class="button-number" data-value="4">4</button>
+            <button type="button" class="button-number" data-value="5">5</button>
+            <button type="button" class="button-number" data-value="6">6</button>
+            <button type="button" class="button-operator" data-value="-">−</button>
+
+            <button type="button" class="button-number" data-value="1">1</button>
+            <button type="button" class="button-number" data-value="2">2</button>
+            <button type="button" class="button-number" data-value="3">3</button>
+            <button type="button" class="button-operator" data-value="+">+</button>
+
+            <button type="button" class="button-number button-wide" data-value="0">0</button>
+            <button type="button" class="button-number" data-value=".">.</button>
+            <button type="button" class="button-equals" data-action="equals">=</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        let currentValue = '0';
+        let previousValue = null;
+        let operator = null;
+        let waitingForSecondValue = false;
+
+        function updateDisplay() {
+            display.textContent = currentValue;
+        }
+
+        function inputDigit(digit) {
+            if (waitingForSecondValue) {
+                currentValue = digit;
+                waitingForSecondValue = false;
+                return;
+            }
+
+            if (currentValue === '0' && digit !== '.') {
+                currentValue = digit;
+            } else if (currentValue === '-0' && digit !== '.') {
+                currentValue = '-' + digit;
+            } else {
+                currentValue = currentValue + digit;
+            }
+        }
+
+        function inputDecimal() {
+            if (waitingForSecondValue) {
+                currentValue = '0.';
+                waitingForSecondValue = false;
+                return;
+            }
+
+            if (!currentValue.includes('.')) {
+                currentValue += '.';
+            }
+        }
+
+        function clearAll() {
+            currentValue = '0';
+            previousValue = null;
+            operator = null;
+            waitingForSecondValue = false;
+        }
+
+        function deleteLast() {
+            if (waitingForSecondValue) {
+                currentValue = '0';
+                waitingForSecondValue = false;
+                return;
+            }
+
+            if (currentValue.length === 1 || (currentValue.length === 2 && currentValue.startsWith('-'))) {
+                currentValue = '0';
+            } else {
+                currentValue = currentValue.slice(0, -1);
+            }
+        }
+
+        function handlePercent() {
+            const value = parseFloat(currentValue);
+            currentValue = String(value / 100);
+        }
+
+        function calculate(first, second, operator) {
+            if (operator === '+') return first + second;
+            if (operator === '-') return first - second;
+            if (operator === '*') return first * second;
+            if (operator === '/') return second === 0 ? 'Error' : first / second;
+            return second;
+        }
+
+        function roundResult(value) {
+            if (typeof value !== 'number' || !Number.isFinite(value)) {
+                return String(value);
+            }
+            return String(parseFloat(value.toFixed(10)));
+        }
+
+        function handleOperator(nextOperator) {
+            const inputValue = parseFloat(currentValue);
+
+            if (operator && waitingForSecondValue) {
+                operator = nextOperator;
+                return;
+            }
+
+            if (previousValue === null) {
+                previousValue = inputValue;
+            } else if (operator) {
+                const result = calculate(previousValue, inputValue, operator);
+                currentValue = roundResult(result);
+                previousValue = typeof result === 'number' ? result : null;
+            }
+
+            operator = nextOperator;
+            waitingForSecondValue = true;
+        }
+
+        function handleEquals() {
+            if (operator === null || waitingForSecondValue) {
+                return;
+            }
+
+            const inputValue = parseFloat(currentValue);
+            const result = calculate(previousValue, inputValue, operator);
+            currentValue = roundResult(result);
+            previousValue = null;
+            operator = null;
+            waitingForSecondValue = false;
+        }
+
+        document.querySelector('.buttons').addEventListener('click', (event) => {
+            const button = event.target.closest('button');
+            if (!button) return;
+
+            const action = button.dataset.action;
+            const value = button.dataset.value;
+
+            if (action === 'clear') {
+                clearAll();
+            } else if (action === 'backspace') {
+                deleteLast();
+            } else if (action === 'percent') {
+                handlePercent();
+            } else if (action === 'credit') {
+                currentValue = 'dev: toki';
+            } else if (action === 'equals') {
+                handleEquals();
+            } else if (value === '.') {
+                inputDecimal();
+            } else if (['+', '-', '*', '/'].includes(value)) {
+                handleOperator(value);
+            } else if (value) {
+                inputDigit(value);
+            }
+
+            updateDisplay();
+        });
+
+        window.addEventListener('keydown', (event) => {
+            const key = event.key;
+
+            if (/^[0-9]$/.test(key)) {
+                inputDigit(key);
+            } else if (key === '.') {
+                inputDecimal();
+            } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+                handleOperator(key);
+            } else if (key === 'Enter' || key === '=') {
+                event.preventDefault();
+                handleEquals();
+            } else if (key === 'Backspace') {
+                deleteLast();
+            } else if (key === 'Delete' || key === 'Escape') {
+                clearAll();
+            }
+
+            updateDisplay();
+        });
+
+        updateDisplay();
+    </script>
+</body>
+</html>
