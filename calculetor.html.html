@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TOKIO Calculator</title>
+</head>
+<body style="display:flex;justify-content:center;align-items:center;height:100vh;background:#87CEEB;font-family:Arial;">
+
+<div style="background:#1E3A8A;padding:20px;border-radius:20px;box-shadow:0 0 20px #000;">
+    <h1 style="margin:0 0 15px;font-size:22px;color:#fff;text-align:center;">TOKIO Calculator</h1>
+    
+    <input id="display" readonly
+    style="width:260px;height:50px;font-size:24px;text-align:right;padding:10px;background:#E0F2FE;border:none;border-radius:10px;margin-bottom:15px;">
+
+    <div style="display:grid;grid-template-columns:repeat(4,65px);gap:10px;">
+
+        <button onclick="credit()" style="background:#2563EB;color:white;">Credit</button>
+        <button onclick="mc()">MC</button>
+        <button onclick="mPlus()">M+</button>
+        <button onclick="mMinus()">M-</button>
+
+        <button onclick="square()">x²</button>
+        <button onclick="cube()">x³</button>
+        <button onclick="root()">√</button>
+        <button onclick="ac()" style="background:red;color:white;">AC</button>
+
+        <button onclick="append('7')">7</button>
+        <button onclick="append('8')">8</button>
+        <button onclick="append('9')">9</button>
+        <button onclick="append('/')" style="background:#2563EB;color:white;">÷</button>
+
+        <button onclick="append('4')">4</button>
+        <button onclick="append('5')">5</button>
+        <button onclick="append('6')">6</button>
+        <button onclick="append('*')" style="background:#2563EB;color:white;">×</button>
+
+        <button onclick="append('1')">1</button>
+        <button onclick="append('2')">2</button>
+        <button onclick="append('3')">3</button>
+        <button onclick="append('-')" style="background:#2563EB;color:white;">−</button>
+
+        <button onclick="append('0')">0</button>
+        <button onclick="append('.')">.</button>
+        <button onclick="calculate()" style="background:green;color:white;">=</button>
+        <button onclick="append('+')" style="background:#2563EB;color:white;">+</button>
+
+    </div>
+</div>
+
+<script>
+let memory = 0;
+
+function append(value){
+    document.getElementById("display").value += value;
+}
+
+function ac(){
+    document.getElementById("display").value = "";
+}
+
+function calculate(){
+    try{
+        document.getElementById("display").value =
+        eval(document.getElementById("display").value);
+    }
+    catch{
+        alert("ভুল ইনপুট!");
+    }
+}
+
+function square(){
+    let x = Number(document.getElementById("display").value);
+    document.getElementById("display").value = x*x;
+}
+
+function cube(){
+    let x = Number(document.getElementById("display").value);
+    document.getElementById("display").value = x*x*x;
+}
+
+function root(){
+    let x = Number(document.getElementById("display").value);
+    document.getElementById("display").value = Math.sqrt(x);
+}
+
+function mPlus(){
+    memory += Number(document.getElementById("display").value);
+}
+
+function mMinus(){
+    memory -= Number(document.getElementById("display").value);
+}
+
+function mr(){
+    document.getElementById("display").value = memory;
+}
+
+function mc(){
+    memory = 0;
+}
+
+function credit(){
+    document.getElementById("display").value = "MHTOKI";
+}
+</script>
+
+</body>
+</html>
